@@ -60,7 +60,11 @@ const Chat = () => {
     }, [localStream]);
 
     useEffect(() => {
-        socket = io();
+        // Connect to backend - uses env var in production, defaults to same origin in dev
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || undefined;
+        socket = io(backendUrl, {
+            transports: ['websocket', 'polling']
+        });
 
         socket.on('connect', () => {
             socket.emit('identify', user.email);
