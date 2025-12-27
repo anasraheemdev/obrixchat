@@ -14,10 +14,17 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const httpServer = createServer(app);
+
+// Configure allowed origins (set FRONTEND_URL in production)
+const allowedOrigins = process.env.FRONTEND_URL
+    ? [process.env.FRONTEND_URL, 'http://localhost:5173']
+    : '*';
+
 const io = new Server(httpServer, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
+        origin: allowedOrigins,
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
@@ -27,18 +34,14 @@ app.use(express.json());
 // Initialize Socket.IO logic
 socketLogic(io);
 
-// Production setup
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, 'dist')));
-
-    app.get('*', (req, res) => {
-        res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+// Health check endpoint
+app.get('/', (req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'ObrixChat Socket.IO Server is running',
+        timestamp: new Date().toISOString()
     });
-} else {
-    app.get('/', (req, res) => {
-        res.send('ObrixChat API is running in development mode. Use Vite for frontend.');
-    });
-}
+});
 
 const PORT = process.env.PORT || 3001;
 httpServer.listen(PORT, () => {
