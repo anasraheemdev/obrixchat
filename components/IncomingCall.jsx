@@ -1,48 +1,70 @@
-import { Phone, PhoneOff } from 'lucide-react';
+import { Phone, PhoneOff, Video, User } from 'lucide-react';
 
 const IncomingCall = ({ callData, onAccept, onReject }) => {
+    const { from, callerName, callerAvatar, type } = callData;
+
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="w-full max-w-sm glass rounded-3xl p-8 text-center shadow-2xl border border-white/10 relative overflow-hidden">
-                {/* Animated Background Pulse */}
-                <div className="absolute inset-0 z-0 flex items-center justify-center">
-                    <div className="w-40 h-40 bg-blue-500/20 rounded-full animate-ping opacity-20"></div>
+        <div className="fixed inset-0 z-[200] bg-[#0b141a] flex flex-col items-center justify-between py-16 animate-in fade-in duration-300">
+            {/* Top Section */}
+            <div className="text-center">
+                <p className="text-[#00a884] text-sm font-medium mb-2 uppercase tracking-wider">
+                    {type === 'video' ? 'Incoming Video Call' : 'Incoming Voice Call'}
+                </p>
+            </div>
+
+            {/* Center - Avatar & Name */}
+            <div className="flex flex-col items-center">
+                {/* Pulsing Ring Animation */}
+                <div className="relative">
+                    <div className="absolute inset-0 rounded-full bg-[#00a884]/20 animate-ping" style={{ animationDuration: '1.5s' }}></div>
+                    <div className="absolute inset-[-8px] rounded-full border-4 border-[#00a884]/30 animate-pulse"></div>
+                    <img
+                        src={callerAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${from}`}
+                        alt={from}
+                        className="w-32 h-32 rounded-full relative z-10 border-4 border-[#00a884]/50"
+                    />
                 </div>
 
-                <div className="relative z-10">
-                    <div className="relative inline-block mb-6">
-                        <img
-                            src={callData.callerAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${callData.from}`}
-                            alt="Caller"
-                            className="w-24 h-24 rounded-3xl object-cover bg-slate-800 border-2 border-blue-500/50"
-                        />
-                        <div className="absolute -bottom-2 -right-2 bg-blue-600 p-2 rounded-xl shadow-lg animate-bounce">
-                            <Phone className="w-4 h-4 text-white" />
-                        </div>
-                    </div>
+                <h2 className="text-white text-2xl font-bold mt-8">
+                    {callerName || from?.split('@')[0]}
+                </h2>
+                <p className="text-gray-400 text-sm mt-1">{from}</p>
 
-                    <h3 className="text-xl font-black text-white mb-1 uppercase tracking-tight">
-                        Incoming {callData.type === 'video' ? 'Video' : 'Voice'} Call
-                    </h3>
-                    <p className="text-slate-400 font-bold text-sm mb-8 tracking-wide">
-                        {callData.callerName || callData.from}
-                    </p>
-
-                    <div className="flex items-center justify-center gap-6">
-                        <button
-                            onClick={onReject}
-                            className="w-14 h-14 rounded-2xl bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all flex items-center justify-center group"
-                        >
-                            <PhoneOff className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                        </button>
-                        <button
-                            onClick={onAccept}
-                            className="w-14 h-14 rounded-2xl bg-green-500/10 hover:bg-green-500 text-green-500 hover:text-white border border-green-500/20 transition-all flex items-center justify-center group shadow-xl shadow-green-500/20"
-                        >
-                            <Phone className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                        </button>
-                    </div>
+                {/* Ringing Animation Dots */}
+                <div className="flex gap-1 mt-6">
+                    <div className="w-2 h-2 rounded-full bg-[#00a884] animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 rounded-full bg-[#00a884] animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 rounded-full bg-[#00a884] animate-bounce" style={{ animationDelay: '300ms' }}></div>
                 </div>
+            </div>
+
+            {/* Bottom - Accept/Reject Buttons */}
+            <div className="flex items-center justify-center gap-16">
+                {/* Reject Button */}
+                <button
+                    onClick={onReject}
+                    className="group flex flex-col items-center gap-2"
+                >
+                    <div className="w-16 h-16 rounded-full bg-red-500 flex items-center justify-center shadow-lg shadow-red-500/30 group-hover:bg-red-400 group-active:scale-95 transition-all">
+                        <PhoneOff className="w-7 h-7 text-white" />
+                    </div>
+                    <span className="text-gray-400 text-sm">Decline</span>
+                </button>
+
+                {/* Accept Button */}
+                <button
+                    onClick={onAccept}
+                    className="group flex flex-col items-center gap-2"
+                >
+                    <div className="w-16 h-16 rounded-full bg-[#00a884] flex items-center justify-center shadow-lg shadow-[#00a884]/30 group-hover:bg-[#00a884]/90 group-active:scale-95 transition-all animate-pulse">
+                        {type === 'video' ? (
+                            <Video className="w-7 h-7 text-white" />
+                        ) : (
+                            <Phone className="w-7 h-7 text-white" />
+                        )}
+                    </div>
+                    <span className="text-gray-400 text-sm">Accept</span>
+                </button>
             </div>
         </div>
     );
